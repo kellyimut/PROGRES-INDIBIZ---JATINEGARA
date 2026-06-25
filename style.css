@@ -254,7 +254,35 @@ main {
   overflow-x: auto;
   border-radius: var(--radius-sm);
   border: 1px solid var(--gray-border);
+  scroll-behavior: smooth;
 }
+.table-wrap::-webkit-scrollbar { height: 6px; }
+.table-wrap::-webkit-scrollbar-track { background: #F1EFE8; border-radius: 99px; }
+.table-wrap::-webkit-scrollbar-thumb { background: #B4B2A9; border-radius: 99px; }
+.table-wrap::-webkit-scrollbar-thumb:hover { background: #888780; }
+.scroll-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  justify-content: flex-end;
+}
+.scroll-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--gray-border);
+  background: var(--white);
+  color: var(--text-sec);
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.15s;
+}
+.scroll-btn:hover { background: var(--gray-bg); color: var(--text-primary); }
+.scroll-hint { font-size: 11px; color: var(--gray-muted); }
 table {
   width: 100%;
   border-collapse: collapse;
