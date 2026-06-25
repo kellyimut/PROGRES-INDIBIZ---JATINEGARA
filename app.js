@@ -57,6 +57,21 @@ function statusBadge(s) {
 }
 
 /* ── Filters ── */
+let filterToday = false;
+
+function toggleTodayFilter() {
+  filterToday = !filterToday;
+  const btn = document.getElementById('btn-today-filter');
+  if (filterToday) {
+    btn.textContent = '✓ Hari Ini';
+    btn.classList.add('active');
+  } else {
+    btn.textContent = 'Semua tanggal';
+    btn.classList.remove('active');
+  }
+  applyFilter();
+}
+
 function getYear(tgl) {
   if (!tgl) return '';
   const parts = tgl.trim().split('/');
@@ -69,7 +84,9 @@ function getFiltered() {
   const month = document.getElementById('filter-month').value;
   const tech = document.getElementById('filter-tech').value;
   const search = (document.getElementById('search-input').value || '').toLowerCase();
+  const todayStr = getTodayString();
   return allData.filter(r => {
+    if (filterToday && (r['TGL'] || '').trim() !== todayStr) return false;
     if (year && getYear(r['TGL']) !== year) return false;
     if (month && r['BULAN'] !== month) return false;
     if (tech && r['TEKNISI'] !== tech) return false;
