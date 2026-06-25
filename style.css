@@ -282,7 +282,26 @@ main {
   transition: background 0.15s;
 }
 .scroll-btn:hover { background: var(--gray-bg); color: var(--text-primary); }
-.scroll-hint { font-size: 11px; color: var(--gray-muted); }
+.btn-today-filter {
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-border);
+  background: var(--white);
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-today-filter:hover {
+  background: var(--gray-bg);
+  color: var(--text-primary);
+}
+.btn-today-filter.active {
+  background: var(--green-dark);
+  color: #fff;
+  border-color: var(--green-dark);
+}
 table {
   width: 100%;
   border-collapse: collapse;
