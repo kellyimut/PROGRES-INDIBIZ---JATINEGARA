@@ -111,33 +111,51 @@ function getTodayString() {
 }
 
 function renderToday() {
-  const todayStr = getTodayString();
   const todayFull = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  document.getElementById('today-label').textContent = todayFull;
+  const year  = document.getElementById('filter-year').value;
+  const month = document.getElementById('filter-month').value;
+  const date  = document.getElementById('filter-date').value;
+  const tech  = document.getElementById('filter-tech').value;
 
-  const search = (document.getElementById('search-today').value || '').toLowerCase();
-  const todayData = allData.filter(r => {
-    const tgl = (r['TGL'] || '').trim();
-    if (tgl !== todayStr) return false;
-    if (search) {
-      const hay = [r['NO ORDER'], r['STATUS'], r['PAKET'], r['TEKNISI'], r['UPDATE'], r['DETAIL KETERANGAN'], r['NO INTERNET / NO TELP']].join(' ').toLowerCase();
-      if (!hay.includes(search)) return false;
+  // Label section: sesuaikan judul dengan filter aktif
+  let label = todayFull;
+  if (date) label = `Tanggal ${date}`;
+  else if (month && year) label = `${month.charAt(0)+month.slice(1).toLowerCase()} ${year}`;
+  else if (month) label = month.charAt(0)+month.slice(1).toLowerCase();
+  else if (year) label = year;
+  document.getElementById('today-label').textContent = label;
+
+  // Ambil data sesuai filter (sama dengan getFiltered tapi tanpa search)
+  const todayStr = getTodayString();
+  const filtered = allData.filter(r => {
+    if (year  && getYear(r['TGL']) !== year) return false;
+    if (month && r['BULAN'] !== month) return false;
+    if (date) {
+      if ((r['TGL'] || '').trim() !== date) return false;
+    } else if (!year && !month) {
+      // default: tampilkan hari ini saja
+      if ((r['TGL'] || '').trim() !== todayStr) return false;
     }
+    if (tech  && r['TEKNISI'] !== tech) return false;
     return true;
   });
 
-  const count = document.getElementById('today-count');
-  const tbody = document.getElementById('tbody-today');
+  const search = (document.getElementById('search-today').value || '').toLowerCase();
+  const data = search ? filtered.filter(r =>
+    [r['NO ORDER'], r['STATUS'], r['PAKET'], r['TEKNISI'], r['UPDATE'], r['DETAIL KETERANGAN'], r['NO INTERNET / NO TELP']].join(' ').toLowerCase().includes(search)
+  ) : filtered;
 
-  if (todayData.length === 0) {
-    count.textContent = 'Belum ada order masuk hari ini';
-    tbody.innerHTML = '<tr><td colspan="10" class="td-center">Tidak ada order untuk hari ini</td></tr>';
+  const count = document.getElementById('today-count');
+  const completeCount = data.filter(r => normalizeStatus(r['STATUS']) === 'Complete').length;
+  count.textContent = `${data.length} order · ${completeCount} complete`;
+
+  const tbody = document.getElementById('tbody-today');
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" class="td-center">Tidak ada data untuk filter ini</td></tr>';
     return;
   }
 
-  count.textContent = `${todayData.length} order masuk hari ini · ${todayData.filter(r => normalizeStatus(r['STATUS']) === 'Complete').length} complete`;
-
-  tbody.innerHTML = todayData.map(r => `
+  tbody.innerHTML = data.map(r => `
     <tr>
       <td>${r['TGL'] || '-'}</td>
       <td title="${r['PAKET'] || ''}">${r['PAKET'] || '-'}</td>
