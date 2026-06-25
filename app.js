@@ -94,9 +94,15 @@ function renderToday() {
   const todayFull = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
   document.getElementById('today-label').textContent = todayFull;
 
+  const search = (document.getElementById('search-today').value || '').toLowerCase();
   const todayData = allData.filter(r => {
     const tgl = (r['TGL'] || '').trim();
-    return tgl === todayStr;
+    if (tgl !== todayStr) return false;
+    if (search) {
+      const hay = [r['NO ORDER'], r['STATUS'], r['PAKET'], r['TEKNISI'], r['UPDATE'], r['DETAIL KETERANGAN'], r['NO INTERNET / NO TELP']].join(' ').toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
   });
 
   const count = document.getElementById('today-count');
