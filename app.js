@@ -80,6 +80,12 @@ function applyFilter() {
   renderToday();
 }
 
+/* ── Scroll Helper ── */
+function scrollTable(id, amount) {
+  const el = document.getElementById(id);
+  if (el) el.scrollBy({ left: amount, behavior: 'smooth' });
+}
+
 /* ── Today's Orders ── */
 function getTodayString() {
   const now = new Date();
