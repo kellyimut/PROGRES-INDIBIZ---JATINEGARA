@@ -50,7 +50,12 @@
         <div id="today-count" style="font-size:12px; color:#5F5E5A;"></div>
         <input type="text" id="search-today" placeholder="Cari no order, status, teknisi..." oninput="renderToday()" style="font-size:12px; padding:5px 10px; border:1px solid #E0DED8; border-radius:6px; background:#F5F5F3; color:#1C1C1A; outline:none; width:280px;" />
       </div>
-      <div class="table-wrap">
+      <div class="scroll-nav">
+        <span class="scroll-hint">Geser tabel:</span>
+        <button class="scroll-btn" onclick="scrollTable('wrap-today', -200)" title="Geser kiri">&#8592;</button>
+        <button class="scroll-btn" onclick="scrollTable('wrap-today', 200)" title="Geser kanan">&#8594;</button>
+      </div>
+      <div class="table-wrap" id="wrap-today">
         <table id="table-today" style="min-width:900px;">
           <thead>
             <tr>
@@ -105,7 +110,12 @@
       <div class="table-controls">
         <input type="text" id="search-input" placeholder="Cari no order, status, paket, teknisi..." oninput="renderTable()" />
       </div>
-      <div class="table-wrap">
+      <div class="scroll-nav">
+        <span class="scroll-hint">Geser tabel:</span>
+        <button class="scroll-btn" onclick="scrollTable('wrap-detail', -200)" title="Geser kiri">&#8592;</button>
+        <button class="scroll-btn" onclick="scrollTable('wrap-detail', 200)" title="Geser kanan">&#8594;</button>
+      </div>
+      <div class="table-wrap" id="wrap-detail">
         <table>
           <thead>
             <tr>
