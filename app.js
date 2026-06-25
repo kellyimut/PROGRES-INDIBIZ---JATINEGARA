@@ -214,8 +214,10 @@ function renderKPI(data) {
     </div>
     <div class="kpi-card ${vsTarget >= 0 ? 'kpi-green' : 'kpi-red'}">
       <div class="kpi-label">vs Target</div>
-      <div class="kpi-value">${vsSign}${vsTarget}</div>
-      <div class="kpi-sub">complete vs 83</div>
+      <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
+        <div class="kpi-value">${vsSign}${vsTarget}</div>
+        <div style="font-size:13px; font-weight:600; color:${vsTarget >= 0 ? '#0F6E56' : '#A32D2D'};">${Math.round(complete / TARGET * 100)}% dari target 83</div>
+      </div>
     </div>
   `;
 }
