@@ -57,11 +57,20 @@ function statusBadge(s) {
 }
 
 /* ── Filters ── */
+function getYear(tgl) {
+  if (!tgl) return '';
+  const parts = tgl.trim().split('/');
+  if (parts.length === 3) return parts[2];
+  return '';
+}
+
 function getFiltered() {
+  const year = document.getElementById('filter-year').value;
   const month = document.getElementById('filter-month').value;
   const tech = document.getElementById('filter-tech').value;
   const search = (document.getElementById('search-input').value || '').toLowerCase();
   return allData.filter(r => {
+    if (year && getYear(r['TGL']) !== year) return false;
     if (month && r['BULAN'] !== month) return false;
     if (tech && r['TEKNISI'] !== tech) return false;
     if (search) {
@@ -403,6 +412,15 @@ function renderTable() {
 
 /* ── Populate Filters ── */
 function populateFilters() {
+  const years = [...new Set(allData.map(r => getYear(r['TGL'])).filter(Boolean))].sort((a,b) => b - a);
+  const ySel = document.getElementById('filter-year');
+  ySel.innerHTML = '<option value="">Semua</option>';
+  years.forEach(y => {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    ySel.appendChild(o);
+  });
+
   const months = [...new Set(allData.map(r => r['BULAN']).filter(Boolean))];
   months.sort((a, b) => MONTHS_ORDER.indexOf(a.toUpperCase()) - MONTHS_ORDER.indexOf(b.toUpperCase()));
   const mSel = document.getElementById('filter-month');
