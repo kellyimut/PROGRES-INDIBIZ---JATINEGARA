@@ -59,18 +59,7 @@ function statusBadge(s) {
 /* ── Filters ── */
 let filterToday = false;
 
-function toggleTodayFilter() {
-  filterToday = !filterToday;
-  const btn = document.getElementById('btn-today-filter');
-  if (filterToday) {
-    btn.textContent = '✓ Hari Ini';
-    btn.classList.add('active');
-  } else {
-    btn.textContent = 'Semua tanggal';
-    btn.classList.remove('active');
-  }
-  applyFilter();
-}
+function toggleTodayFilter() {}
 
 function getYear(tgl) {
   if (!tgl) return '';
@@ -80,16 +69,16 @@ function getYear(tgl) {
 }
 
 function getFiltered() {
-  const year = document.getElementById('filter-year').value;
+  const year  = document.getElementById('filter-year').value;
   const month = document.getElementById('filter-month').value;
-  const tech = document.getElementById('filter-tech').value;
+  const date  = document.getElementById('filter-date').value;
+  const tech  = document.getElementById('filter-tech').value;
   const search = (document.getElementById('search-input').value || '').toLowerCase();
-  const todayStr = getTodayString();
   return allData.filter(r => {
-    if (filterToday && (r['TGL'] || '').trim() !== todayStr) return false;
-    if (year && getYear(r['TGL']) !== year) return false;
+    if (year  && getYear(r['TGL']) !== year) return false;
     if (month && r['BULAN'] !== month) return false;
-    if (tech && r['TEKNISI'] !== tech) return false;
+    if (date  && (r['TGL'] || '').trim() !== date) return false;
+    if (tech  && r['TEKNISI'] !== tech) return false;
     if (search) {
       const hay = [r['NO ORDER'], r['STATUS'], r['PAKET'], r['BULAN'], r['TEKNISI'], r['UPDATE'], r['DETAIL KETERANGAN']].join(' ').toLowerCase();
       if (!hay.includes(search)) return false;
@@ -438,6 +427,20 @@ function populateFilters() {
     ySel.appendChild(o);
   });
 
+  const dates = [...new Set(allData.map(r => (r['TGL'] || '').trim()).filter(Boolean))].sort((a, b) => {
+    const pa = a.split('/'), pb = b.split('/');
+    return new Date(pb[2], pb[1]-1, pb[0]) - new Date(pa[2], pa[1]-1, pa[0]);
+  });
+  const dSel = document.getElementById('filter-date');
+  dSel.innerHTML = '<option value="">Semua</option>';
+  const todayStr = getTodayString();
+  dates.forEach(d => {
+    const o = document.createElement('option');
+    o.value = d;
+    o.textContent = d === todayStr ? `${d} (Hari Ini)` : d;
+    dSel.appendChild(o);
+  });
+
   const months = [...new Set(allData.map(r => r['BULAN']).filter(Boolean))];
   months.sort((a, b) => MONTHS_ORDER.indexOf(a.toUpperCase()) - MONTHS_ORDER.indexOf(b.toUpperCase()));
   const mSel = document.getElementById('filter-month');
@@ -454,8 +457,7 @@ function populateFilters() {
   tSel.innerHTML = '<option value="">Semua</option>';
   techs.forEach(t => {
     const o = document.createElement('option');
-    o.value = t;
-    o.textContent = t;
+    o.value = t; o.textContent = t;
     tSel.appendChild(o);
   });
 }
