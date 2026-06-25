@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard INDIBIZ – STO JTN</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <div class="header-title">Dashboard INDIBIZ</div>
+        <div class="header-sub">STO Jatinegara · Monitoring Provisioning</div>
+      </div>
+      <div class="header-right">
+        <span class="last-update" id="last-update">Memuat data...</span>
+        <button class="btn-refresh" onclick="loadData()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label for="filter-month">Bulan</label>
+        <select id="filter-month" onchange="applyFilter()">
+          <option value="">Semua</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-tech">Teknisi</label>
+        <select id="filter-tech" onchange="applyFilter()">
+          <option value="">Semua</option>
+        </select>
+      </div>
+    </div>
+
+    <section class="section-label">Ringkasan KPI</section>
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card skeleton"><div class="kpi-label">Memuat...</div><div class="kpi-value">—</div></div>
+    </div>
+
+    <section class="section-label">Progres Bulanan vs Target (83)</section>
+    <div class="card chart-card">
+      <div class="legend" id="legend-monthly">
+        <span class="legend-item"><span class="legend-dot" style="background:#0F6E56;"></span>Complete</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#BA7517; border: 2px dashed #BA7517; background:transparent;"></span>Target (83)</span>
+      </div>
+      <div class="chart-wrap" style="height:240px;">
+        <canvas id="chart-monthly" role="img" aria-label="Grafik bar jumlah complete per bulan vs target 83"></canvas>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card chart-card">
+        <div class="chart-title">Distribusi status</div>
+        <div class="legend" id="legend-status"></div>
+        <div class="chart-wrap" style="height:200px;">
+          <canvas id="chart-status" role="img" aria-label="Donut chart distribusi status order"></canvas>
+        </div>
+      </div>
+      <div class="card chart-card">
+        <div class="chart-title">Performa teknisi (complete)</div>
+        <div class="chart-wrap" id="tech-chart-wrap" style="height:200px;">
+          <canvas id="chart-tech" role="img" aria-label="Bar horizontal jumlah complete per teknisi"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <section class="section-label">Detail Order</section>
+    <div class="card">
+      <div class="table-controls">
+        <input type="text" id="search-input" placeholder="Cari no order, status, paket, teknisi..." oninput="renderTable()" />
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Paket</th>
+              <th>No Order</th>
+              <th>Bulan</th>
+              <th>Teknisi</th>
+              <th>Status</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr><td colspan="7" class="td-center">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-count" id="table-count"></div>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
