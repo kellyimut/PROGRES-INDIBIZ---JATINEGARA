@@ -525,20 +525,24 @@ async function loadData() {
 loadData();
 
 // Auto-refresh setiap 1 menit
-let countdown = 60;
+let countdown = 300;
 function startCountdown() {
-  countdown = 60;
+  countdown = 300;
   const el = document.getElementById('countdown');
   clearInterval(window._cdInterval);
   window._cdInterval = setInterval(() => {
     countdown--;
-    if (el) el.textContent = `· refresh dalam ${countdown}s`;
+    if (el) {
+      const menit = Math.floor(countdown / 60);
+      const detik = countdown % 60;
+      el.textContent = `· refresh dalam ${menit}m ${String(detik).padStart(2,'0')}s`;
+    }
     if (countdown <= 0) clearInterval(window._cdInterval);
   }, 1000);
 }
 
 setInterval(() => {
   loadData();
-}, 60000);
+}, 300000);
 
 startCountdown();
