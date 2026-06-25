@@ -416,34 +416,35 @@ function renderTable() {
     (searched.length < filtered.length ? ` · filter aktif: ${filtered.length} data` : '');
 }
 
-/* ── Populate Filters ── */
 function populateFilters() {
   const years = [...new Set(allData.map(r => getYear(r['TGL'])).filter(Boolean))].sort((a,b) => b - a);
   const ySel = document.getElementById('filter-year');
+  const prevYear = ySel.value;
   ySel.innerHTML = '<option value="">Semua</option>';
   years.forEach(y => {
     const o = document.createElement('option');
     o.value = y; o.textContent = y;
     ySel.appendChild(o);
   });
+  if (prevYear) ySel.value = prevYear;
 
-  const dates = [...new Set(allData.map(r => (r['TGL'] || '').trim()).filter(Boolean))].sort((a, b) => {
-    const pa = a.split('/'), pb = b.split('/');
-    return new Date(pb[2], pb[1]-1, pb[0]) - new Date(pa[2], pa[1]-1, pa[0]);
-  });
-  const dSel = document.getElementById('filter-date');
-  dSel.innerHTML = '<option value="">Semua</option>';
-  const todayStr = getTodayString();
-  dates.forEach(d => {
-    const o = document.createElement('option');
-    o.value = d;
-    o.textContent = d === todayStr ? `${d} (Hari Ini)` : d;
-    dSel.appendChild(o);
+  updateDependentFilters();
+}
+
+function updateDependentFilters() {
+  const year  = document.getElementById('filter-year').value;
+  const month = document.getElementById('filter-month').value;
+
+  const filtered = allData.filter(r => {
+    if (year  && getYear(r['TGL']) !== year) return false;
+    if (month && r['BULAN'] !== month) return false;
+    return true;
   });
 
-  const months = [...new Set(allData.map(r => r['BULAN']).filter(Boolean))];
+  const months = [...new Set(allData.filter(r => !year || getYear(r['TGL']) === year).map(r => r['BULAN']).filter(Boolean))];
   months.sort((a, b) => MONTHS_ORDER.indexOf(a.toUpperCase()) - MONTHS_ORDER.indexOf(b.toUpperCase()));
   const mSel = document.getElementById('filter-month');
+  const prevMonth = mSel.value;
   mSel.innerHTML = '<option value="">Semua</option>';
   months.forEach(m => {
     const o = document.createElement('option');
@@ -451,15 +452,34 @@ function populateFilters() {
     o.textContent = m.charAt(0) + m.slice(1).toLowerCase();
     mSel.appendChild(o);
   });
+  if (months.includes(prevMonth)) mSel.value = prevMonth;
 
-  const techs = [...new Set(allData.map(r => r['TEKNISI']).filter(Boolean))].sort();
+  const dates = [...new Set(filtered.map(r => (r['TGL'] || '').trim()).filter(Boolean))].sort((a, b) => {
+    const pa = a.split('/'), pb = b.split('/');
+    return new Date(pb[2], pb[1]-1, pb[0]) - new Date(pa[2], pa[1]-1, pa[0]);
+  });
+  const dSel = document.getElementById('filter-date');
+  const prevDate = dSel.value;
+  const todayStr = getTodayString();
+  dSel.innerHTML = '<option value="">Semua</option>';
+  dates.forEach(d => {
+    const o = document.createElement('option');
+    o.value = d;
+    o.textContent = d === todayStr ? `${d} (Hari Ini)` : d;
+    dSel.appendChild(o);
+  });
+  if (dates.includes(prevDate)) dSel.value = prevDate;
+
+  const techs = [...new Set(filtered.map(r => r['TEKNISI']).filter(Boolean))].sort();
   const tSel = document.getElementById('filter-tech');
+  const prevTech = tSel.value;
   tSel.innerHTML = '<option value="">Semua</option>';
   techs.forEach(t => {
     const o = document.createElement('option');
     o.value = t; o.textContent = t;
     tSel.appendChild(o);
   });
+  if (techs.includes(prevTech)) tSel.value = prevTech;
 }
 
 /* ── Load Data ── */
