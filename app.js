@@ -514,6 +514,7 @@ async function loadData() {
     populateFilters();
     applyFilter();
     renderToday();
+    startCountdown();
   } catch (e) {
     document.getElementById('last-update').textContent = 'Gagal memuat data';
     document.getElementById('table-body').innerHTML =
@@ -522,3 +523,22 @@ async function loadData() {
 }
 
 loadData();
+
+// Auto-refresh setiap 1 menit
+let countdown = 60;
+function startCountdown() {
+  countdown = 60;
+  const el = document.getElementById('countdown');
+  clearInterval(window._cdInterval);
+  window._cdInterval = setInterval(() => {
+    countdown--;
+    if (el) el.textContent = `· refresh dalam ${countdown}s`;
+    if (countdown <= 0) clearInterval(window._cdInterval);
+  }, 1000);
+}
+
+setInterval(() => {
+  loadData();
+}, 60000);
+
+startCountdown();
