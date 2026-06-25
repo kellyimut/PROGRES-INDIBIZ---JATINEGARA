@@ -77,6 +77,53 @@ function applyFilter() {
   renderKPI(data);
   renderCharts(data);
   renderTable();
+  renderToday();
+}
+
+/* ── Today's Orders ── */
+function getTodayString() {
+  const now = new Date();
+  const d = String(now.getDate()).padStart(2, '0');
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const y = now.getFullYear();
+  return `${d}/${m}/${y}`;
+}
+
+function renderToday() {
+  const todayStr = getTodayString();
+  const todayFull = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('today-label').textContent = todayFull;
+
+  const todayData = allData.filter(r => {
+    const tgl = (r['TGL'] || '').trim();
+    return tgl === todayStr;
+  });
+
+  const count = document.getElementById('today-count');
+  const tbody = document.getElementById('tbody-today');
+
+  if (todayData.length === 0) {
+    count.textContent = 'Belum ada order masuk hari ini';
+    tbody.innerHTML = '<tr><td colspan="10" class="td-center">Tidak ada order untuk hari ini</td></tr>';
+    return;
+  }
+
+  count.textContent = `${todayData.length} order masuk hari ini · ${todayData.filter(r => normalizeStatus(r['STATUS']) === 'Complete').length} complete`;
+
+  tbody.innerHTML = todayData.map(r => `
+    <tr>
+      <td>${r['TGL'] || '-'}</td>
+      <td title="${r['PAKET'] || ''}">${r['PAKET'] || '-'}</td>
+      <td class="mono">${r['NO ORDER'] || '-'}</td>
+      <td class="mono">${r['NO INTERNET / NO TELP'] || r['NO INTERNET'] || r['NO TELP'] || '-'}</td>
+      <td>${statusBadge(r['STATUS'])}</td>
+      <td title="${r['UPDATE'] || ''}">${r['UPDATE'] || '-'}</td>
+      <td title="${r['DETAIL KETERANGAN'] || ''}" style="max-width:200px;">${r['DETAIL KETERANGAN'] || '-'}</td>
+      <td>${r['BULAN'] ? (r['BULAN'].charAt(0) + r['BULAN'].slice(1).toLowerCase()) : '-'}</td>
+      <td>${r['TANGGAL MANJA'] || '-'}</td>
+      <td>${r['TEKNISI'] || '-'}</td>
+    </tr>
+  `).join('');
 }
 
 /* ── KPI ── */
@@ -355,6 +402,7 @@ async function loadData() {
     document.getElementById('last-update').textContent = `Diperbarui: ${now} · ${allData.length} baris`;
     populateFilters();
     applyFilter();
+    renderToday();
   } catch (e) {
     document.getElementById('last-update').textContent = 'Gagal memuat data';
     document.getElementById('table-body').innerHTML =
