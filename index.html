@@ -27,13 +27,13 @@
     <div class="filter-bar">
       <div class="filter-group">
         <label for="filter-year">Tahun</label>
-        <select id="filter-year" onchange="applyFilter()">
+        <select id="filter-year" onchange="updateDependentFilters(); applyFilter()">
           <option value="">Semua</option>
         </select>
       </div>
       <div class="filter-group">
         <label for="filter-month">Bulan</label>
-        <select id="filter-month" onchange="applyFilter()">
+        <select id="filter-month" onchange="updateDependentFilters(); applyFilter()">
           <option value="">Semua</option>
         </select>
       </div>
