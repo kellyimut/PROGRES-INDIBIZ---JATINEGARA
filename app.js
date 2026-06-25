@@ -162,7 +162,7 @@ function renderToday() {
       <td class="mono">${r['NO ORDER'] || '-'}</td>
       <td class="mono">${r['NO INTERNET / NO TELP'] || r['NO INTERNET'] || r['NO TELP'] || '-'}</td>
       <td>${statusBadge(r['STATUS'])}</td>
-      <td title="${r['UPDATE'] || ''}">${r['UPDATE'] || '-'}</td>
+      <td title="${r['UPDATE'] || ''}" style="white-space:normal; word-break:break-word; line-height:1.4;">${r['UPDATE'] || '-'}</td>
       <td title="${r['DETAIL KETERANGAN'] || ''}" style="max-width:250px; white-space:normal; word-break:break-word; line-height:1.4;">${r['DETAIL KETERANGAN'] || '-'}</td>
       <td>${r['BULAN'] ? (r['BULAN'].charAt(0) + r['BULAN'].slice(1).toLowerCase()) : '-'}</td>
       <td>${r['TANGGAL MANJA'] || '-'}</td>
