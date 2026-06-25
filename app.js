@@ -191,17 +191,22 @@ function renderCharts(data) {
 function renderMonthly(data) {
   const monthMap = {};
   data.forEach(r => {
-    const m = (r['BULAN'] || 'LAINNYA').toUpperCase();
+    const m = (r['BULAN'] || 'LAINNYA').toUpperCase().trim();
     if (!monthMap[m]) monthMap[m] = 0;
     if (normalizeStatus(r['STATUS']) === 'Complete') monthMap[m]++;
   });
-  const months = Object.keys(monthMap).sort((a, b) => MONTHS_ORDER.indexOf(a) - MONTHS_ORDER.indexOf(b));
+
+  const knownMonths = MONTHS_ORDER.filter(m => monthMap[m] !== undefined);
+  const unknownMonths = Object.keys(monthMap).filter(m => !MONTHS_ORDER.includes(m));
+  const months = [...knownMonths, ...unknownMonths];
+
   const completes = months.map(m => monthMap[m]);
   const labels = months.map(m => m.charAt(0) + m.slice(1).toLowerCase());
 
   if (charts.monthly) charts.monthly.destroy();
   charts.monthly = new Chart(document.getElementById('chart-monthly'), {
     type: 'bar',
+    plugins: [ChartDataLabels],
     data: {
       labels,
       datasets: [
@@ -211,6 +216,13 @@ function renderMonthly(data) {
           backgroundColor: '#0F6E56',
           borderRadius: 5,
           barPercentage: 0.55,
+          datalabels: {
+            anchor: 'end',
+            align: 'end',
+            color: '#085041',
+            font: { size: 11, weight: '600' },
+            formatter: v => v > 0 ? v : ''
+          }
         },
         {
           label: 'Target (83)',
@@ -222,13 +234,23 @@ function renderMonthly(data) {
           pointRadius: 0,
           fill: false,
           tension: 0,
+          datalabels: { display: false }
         }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          color: '#085041',
+          font: { size: 11, weight: '600' },
+          formatter: v => v > 0 ? v : ''
+        }
+      },
       scales: {
         x: {
           ticks: { autoSkip: false, maxRotation: 35, font: { size: 11 } },
@@ -267,7 +289,8 @@ function renderStatus(data) {
         data: values,
         backgroundColor: STATUS_COLORS,
         borderWidth: 2,
-        borderColor: '#fff'
+        borderColor: '#fff',
+        datalabels: { display: false }
       }]
     },
     options: {
@@ -316,6 +339,7 @@ function renderTech(data) {
         backgroundColor: '#185FA5',
         borderRadius: 4,
         barPercentage: 0.6,
+        datalabels: { display: false }
       }]
     },
     options: {
