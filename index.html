@@ -38,10 +38,10 @@
         </select>
       </div>
       <div class="filter-group">
-        <label>Hari Ini</label>
-        <button id="btn-today-filter" onclick="toggleTodayFilter()" class="btn-today-filter">
-          Semua tanggal
-        </button>
+        <label for="filter-date">Tanggal</label>
+        <select id="filter-date" onchange="applyFilter()">
+          <option value="">Semua</option>
+        </select>
       </div>
       <div class="filter-group">
         <label for="filter-tech">Teknisi</label>
