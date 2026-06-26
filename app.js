@@ -189,6 +189,7 @@ function renderKPI(data) {
   const yearFilterValue = document.getElementById('filter-year').value;
   const monthFilterValue = document.getElementById('filter-month').value;
   const dateFilterValue = document.getElementById('filter-date').value;
+  const techFilterValue = document.getElementById('filter-tech').value;
   let scopeLabel = 'Semua Periode';
   if (dateFilterValue) {
     scopeLabel = dateFilterValue;
@@ -199,6 +200,27 @@ function renderKPI(data) {
   } else if (yearFilterValue) {
     scopeLabel = yearFilterValue;
   }
+
+  // Judul kartu mengikuti tingkat filter paling spesifik yang aktif, urutan prioritas:
+  // Teknisi > Tanggal > Bulan > Tahun > tidak ada filter.
+  // - Tidak ada filter sama sekali     -> "REALISASI PS — <tahun berjalan>"
+  // - Hanya Tahun                     -> "REALISASI PS — <tahun yang dipilih>"
+  // - Tahun & Bulan (atau Bulan saja) -> "REALISASI PS — BULAN INI"
+  // - + Tanggal dipilih juga          -> "REALISASI PS — HARI INI"
+  // - + Teknisi dipilih juga          -> "REALISASI PS — TEKNISI"
+  let kpiTitle;
+  if (techFilterValue) {
+    kpiTitle = 'REALISASI PS — TEKNISI';
+  } else if (dateFilterValue) {
+    kpiTitle = 'REALISASI PS — HARI INI';
+  } else if (monthFilterValue) {
+    kpiTitle = 'REALISASI PS — BULAN INI';
+  } else if (yearFilterValue) {
+    kpiTitle = `REALISASI PS — ${yearFilterValue}`;
+  } else {
+    kpiTitle = `REALISASI PS — ${new Date().getFullYear()}`;
+  }
+
 
   document.getElementById('kpi-grid').innerHTML = `
     <div class="kpi-card kpi-dark">
@@ -228,7 +250,7 @@ function renderKPI(data) {
       <div class="kpi-sub">cancel & OSS</div>
     </div>
     <div class="kpi-card ${pct >= 70 ? 'kpi-green' : pct >= 50 ? 'kpi-amber' : 'kpi-red'}">
-      <div class="kpi-label">REALISASI PS BULAN INI</div>
+      <div class="kpi-label">${kpiTitle}</div>
       <div class="kpi-value">${pct}%</div>
       <div class="kpi-sub">${complete} PS dari ${total} order (${scopeLabel})</div>
     </div>
