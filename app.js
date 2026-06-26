@@ -185,6 +185,15 @@ function renderKPI(data) {
   const vsTarget = complete - TARGET;
   const vsSign = vsTarget >= 0 ? '+' : '';
 
+  // Realisasi PS bulan ini: total PS (complete) bulan berjalan dibagi total order bulan berjalan.
+  // Dihitung dari allData (bukan data terfilter), jadi tetap akurat berapa pun filter yang aktif.
+  const currentMonthName = MONTHS_ORDER[new Date().getMonth()];
+  const monthRows = allData.filter(r => r['BULAN'] === currentMonthName);
+  const monthTotal = monthRows.length;
+  const monthComplete = monthRows.filter(r => normalizeStatus(r['STATUS']) === 'Complete').length;
+  const realisasiPct = monthTotal > 0 ? Math.round(monthComplete / monthTotal * 100) : 0;
+  const monthLabel = currentMonthName.charAt(0) + currentMonthName.slice(1).toLowerCase();
+
   document.getElementById('kpi-grid').innerHTML = `
     <div class="kpi-card kpi-dark">
       <div class="kpi-label">Total Order</div>
@@ -212,10 +221,10 @@ function renderKPI(data) {
       <div class="kpi-value">${cancel}</div>
       <div class="kpi-sub">cancel & OSS</div>
     </div>
-    <div class="kpi-card ${vsTarget >= 0 ? 'kpi-green' : 'kpi-red'}">
-      <div class="kpi-label">vs Target</div>
-      <div class="kpi-value">${Math.round(complete / TARGET * 100)}%</div>
-      <div class="kpi-sub">${vsSign}${vsTarget} dari target 83</div>
+    <div class="kpi-card ${realisasiPct >= 70 ? 'kpi-green' : realisasiPct >= 50 ? 'kpi-amber' : 'kpi-red'}">
+      <div class="kpi-label">REALISASI PS BULAN INI</div>
+      <div class="kpi-value">${realisasiPct}%</div>
+      <div class="kpi-sub">${monthComplete} PS dari ${monthTotal} order (${monthLabel})</div>
     </div>
   `;
 }
