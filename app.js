@@ -182,17 +182,23 @@ function renderKPI(data) {
   }).length;
   const pct = total > 0 ? Math.round(complete / total * 100) : 0;
   const pctTarget = Math.round(Math.min(complete / TARGET * 100, 100));
-  const vsTarget = complete - TARGET;
-  const vsSign = vsTarget >= 0 ? '+' : '';
 
-  // Realisasi PS bulan ini: total PS (complete) bulan berjalan dibagi total order bulan berjalan.
-  // Dihitung dari allData (bukan data terfilter), jadi tetap akurat berapa pun filter yang aktif.
-  const currentMonthName = MONTHS_ORDER[new Date().getMonth()];
-  const monthRows = allData.filter(r => r['BULAN'] === currentMonthName);
-  const monthTotal = monthRows.length;
-  const monthComplete = monthRows.filter(r => normalizeStatus(r['STATUS']) === 'Complete').length;
-  const realisasiPct = monthTotal > 0 ? Math.round(monthComplete / monthTotal * 100) : 0;
-  const monthLabel = currentMonthName.charAt(0) + currentMonthName.slice(1).toLowerCase();
+  // Realisasi PS: 100% ikut filter yang aktif di header (Tahun/Bulan/Tanggal/Teknisi/cari).
+  // Sengaja TIDAK ada fallback "bulan kalender berjalan" lagi -- nilainya sama persis
+  // dengan scope `data` yang sudah terfilter, supaya tidak pernah menyimpang dari filter.
+  const yearFilterValue = document.getElementById('filter-year').value;
+  const monthFilterValue = document.getElementById('filter-month').value;
+  const dateFilterValue = document.getElementById('filter-date').value;
+  let scopeLabel = 'Semua Periode';
+  if (dateFilterValue) {
+    scopeLabel = dateFilterValue;
+  } else if (monthFilterValue && yearFilterValue) {
+    scopeLabel = `${monthFilterValue.charAt(0)}${monthFilterValue.slice(1).toLowerCase()} ${yearFilterValue}`;
+  } else if (monthFilterValue) {
+    scopeLabel = monthFilterValue.charAt(0) + monthFilterValue.slice(1).toLowerCase();
+  } else if (yearFilterValue) {
+    scopeLabel = yearFilterValue;
+  }
 
   document.getElementById('kpi-grid').innerHTML = `
     <div class="kpi-card kpi-dark">
@@ -221,10 +227,10 @@ function renderKPI(data) {
       <div class="kpi-value">${cancel}</div>
       <div class="kpi-sub">cancel & OSS</div>
     </div>
-    <div class="kpi-card ${realisasiPct >= 70 ? 'kpi-green' : realisasiPct >= 50 ? 'kpi-amber' : 'kpi-red'}">
+    <div class="kpi-card ${pct >= 70 ? 'kpi-green' : pct >= 50 ? 'kpi-amber' : 'kpi-red'}">
       <div class="kpi-label">REALISASI PS BULAN INI</div>
-      <div class="kpi-value">${realisasiPct}%</div>
-      <div class="kpi-sub">${monthComplete} PS dari ${monthTotal} order (${monthLabel})</div>
+      <div class="kpi-value">${pct}%</div>
+      <div class="kpi-sub">${complete} PS dari ${total} order (${scopeLabel})</div>
     </div>
   `;
 }
