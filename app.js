@@ -1102,9 +1102,9 @@ async function loadTselData() {
         const { rows: rowsT } = parseCSV(textT);
         // Asumsi: sheet ini berisi daftar teknisi yang hadir hari ini
         // Hitung baris yang berisi nama teknisi (non-kosong)
-        // Skip 4 baris pertama (kosong, judul, tanggal, kosong)
-        // Data teknisi mulai baris ke-5
-        const dataRowsT = rowsT.slice(4);
+        // Skip 3 baris pertama (kosong/judul/tanggal)
+        // Data teknisi mulai baris ke-4 (baris 5 di sheet = index 3 setelah parseCSV skip baris 1)
+        const dataRowsT = rowsT.slice(3);
         tselTeknisiHadir = dataRowsT.filter(r => {
           const vals = Object.values(r);
           return vals.some(v => v && v.trim());
