@@ -792,10 +792,13 @@ function tselRenderSetting() {
     return;
   }
 
-  tbody.innerHTML = data.map((r) => {
+  tbody.innerHTML = data.map((r, i) => {
     const rowIdx = r['_ROW_INDEX'];
     return `<tr>
-      <td>${tselDateToDisplay(r['_COL_A'])}</td>
+      <td style="text-align:center;color:#888;">${i + 1}</td>
+      <td class="editable-cell" onclick="tselOpenEditDate(this, 'TGL_SETTING', ${rowIdx}, '${(r['_COL_A']||'').replace(/'/g,"\\'")}')">
+        ${tselDateToDisplay(r['_COL_A']) || '<span style="color:#aaa">— isi —</span>'}
+      </td>
       <td>${tselDateToDisplay(r['_COL_B'])}</td>
       <td class="mono">${r['_COL_C'] || '-'}</td>
       <td class="mono">${r['_COL_D'] || '-'}</td>
@@ -803,6 +806,7 @@ function tselRenderSetting() {
       <td class="editable-cell" onclick="tselOpenEdit(this, 'STATUS_BIMA', ${rowIdx}, '${(r['_COL_H']||'').replace(/'/g,"\\'")}')">
         ${tselBimaBadge(r['_COL_H'])}
       </td>
+      <td style="color:#5F5E5A;font-size:11px;">${r['_COL_P'] || '-'}</td>
       <td class="editable-cell" onclick="tselOpenEdit(this, 'TEKNISI', ${rowIdx}, '${(r['_COL_X']||'').replace(/'/g,"\\'")}')">
         ${r['_COL_X'] || '<span style="color:#aaa">— pilih —</span>'}
       </td>
