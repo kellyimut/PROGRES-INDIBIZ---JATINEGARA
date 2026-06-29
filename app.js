@@ -1075,6 +1075,11 @@ async function loadTselData() {
     // Jadi kita skip rows[0] (yang isinya nama kolom), data mulai rows[1]
 
     const dataRows = rows.slice(1); // skip baris header kedua
+    // Debug: cek 3 baris pertama
+    console.log('DEBUG rows[0]:', JSON.stringify(Object.values(rows[0])).substring(0, 200));
+    console.log('DEBUG rows[1]:', JSON.stringify(Object.values(rows[1])).substring(0, 200));
+    console.log('DEBUG dataRows[0] vals:', JSON.stringify(Object.values(dataRows[0])).substring(0, 200));
+    console.log('DEBUG dataRows[0] COL_H (index 7):', Object.values(dataRows[0])[7]);
     tselAllData = dataRows.map((r, idx) => {
       const vals = Object.values(r);
       return {
@@ -1102,12 +1107,12 @@ async function loadTselData() {
         const { rows: rowsT } = parseCSV(textT);
         // Asumsi: sheet ini berisi daftar teknisi yang hadir hari ini
         // Hitung baris yang berisi nama teknisi (non-kosong)
-        // Skip 3 baris pertama (kosong/judul/tanggal)
-        // Data teknisi mulai baris ke-4 (baris 5 di sheet = index 3 setelah parseCSV skip baris 1)
-        const dataRowsT = rowsT.slice(3);
-        tselTeknisiHadir = dataRowsT.filter(r => {
-          const vals = Object.values(r);
-          return vals.some(v => v && v.trim());
+        // Hitung teknisi hadir:
+        // Cari baris yang mengandung "JTN |" (format nama teknisi)
+        // Ini paling robust karena tidak bergantung jumlah baris header
+        tselTeknisiHadir = rowsT.filter(r => {
+          const rowText = Object.values(r).join(' ').trim();
+          return rowText.toUpperCase().includes('JTN |') || rowText.toUpperCase().includes('JTN|');
         }).length;
       }
     } catch (e2) {
