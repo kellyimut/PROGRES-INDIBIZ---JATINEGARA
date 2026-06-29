@@ -285,20 +285,22 @@
           <button class="scroll-btn" onclick="scrollTable('tsel-wrap-setting', 200)">&#8594;</button>
         </div>
         <div class="table-wrap" id="tsel-wrap-setting">
-          <table style="min-width:1100px;">
+          <table style="min-width:1400px;">
             <thead>
               <tr>
-                <th>Tgl Setting</th>
+                <th>No</th>
+                <th>Tgl Setting ✎</th>
                 <th>Tgl Order BIMA</th>
                 <th>Workorder PSB</th>
                 <th>WO ODP Validation</th>
                 <th>CRM Order Type</th>
                 <th>Status BIMA ✎</th>
+                <th>Progress</th>
                 <th>Regu/Teknisi ✎</th>
                 <th>Status QC2 ✎</th>
               </tr>
             </thead>
-            <tbody id="tsel-tbody-setting"><tr><td colspan="8" class="td-center">Memuat data...</td></tr></tbody>
+            <tbody id="tsel-tbody-setting"><tr><td colspan="10" class="td-center">Memuat data...</td></tr></tbody>
           </table>
         </div>
         <div class="table-count" id="tsel-count-setting"></div>
@@ -307,7 +309,7 @@
       <!-- Hidden elements needed by JS -->
       <div style="display:none;">
         <input id="tsel-search-total" />
-        <tbody id="tsel-tbody-total"></tbody>
+        <table><tbody id="tsel-tbody-total"></tbody></table>
         <div id="tsel-count-total"></div>
       </div>
     </main>
