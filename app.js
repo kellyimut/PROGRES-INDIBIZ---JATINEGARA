@@ -23,6 +23,7 @@ const TSEL_CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vS1n1wEMS9qPOCP6XDFDBbe03y5lNl5D-9Aq8fSYJtpTLLjX3nQFL4EL6ZXkllhRLcshjpA11AeFKS8/pub?gid=0&single=true&output=csv';
 
 // Sheet "TEKNISI HARI INI" — untuk card jumlah teknisi hadir
+// Ganti gid=1 dengan gid yang benar untuk sheet "TEKNISI HARI INI"
 const TSEL_TEKNISI_CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vS1n1wEMS9qPOCP6XDFDBbe03y5lNl5D-9Aq8fSYJtpTLLjX3nQFL4EL6ZXkllhRLcshjpA11AeFKS8/pub?gid=82778435&single=true&output=csv';
 
@@ -512,8 +513,12 @@ function tselQc2Badge(s) {
 function tselApplyFilter() {
   const month  = document.getElementById('tsel-filter-month').value;
   const year   = document.getElementById('tsel-filter-year').value;
+  const date   = document.getElementById('tsel-filter-date') ? document.getElementById('tsel-filter-date').value : '';
   const status = document.getElementById('tsel-filter-status').value;
   const tech   = document.getElementById('tsel-filter-tech').value;
+
+  // Update date dropdown when month/year changes
+  tselUpdateDateFilter();
 
   tselFilteredData = tselAllData.filter(r => {
     const dB = parseTselDate(r['_COL_B']); // Tgl Order BIMA
@@ -522,6 +527,10 @@ function tselApplyFilter() {
     }
     if (year && dB) {
       if (String(dB.getFullYear()) !== year) return false;
+    }
+    if (date && dB) {
+      const dStr = `${String(dB.getDate()).padStart(2,'0')}/${String(dB.getMonth()+1).padStart(2,'0')}/${dB.getFullYear()}`;
+      if (dStr !== date) return false;
     }
     if (status) {
       if ((r['_COL_H'] || '').toUpperCase().trim() !== status) return false;
@@ -563,6 +572,46 @@ function tselPopulateFilters() {
   const mSel = document.getElementById('tsel-filter-month');
   if (mSel && !mSel.value) {
     mSel.value = String(new Date().getMonth() + 1);
+  }
+
+  // Populate filter tanggal dari data
+  tselUpdateDateFilter();
+}
+
+function tselUpdateDateFilter() {
+  const month = document.getElementById('tsel-filter-month').value;
+  const year  = document.getElementById('tsel-filter-year').value;
+
+  const dates = [...new Set(tselAllData
+    .filter(r => {
+      const d = parseTselDate(r['_COL_B']);
+      if (!d) return false;
+      if (month && String(d.getMonth()+1) !== month) return false;
+      if (year  && String(d.getFullYear()) !== year) return false;
+      return true;
+    })
+    .map(r => {
+      const d = parseTselDate(r['_COL_B']);
+      return d ? `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}` : null;
+    })
+    .filter(Boolean)
+  )].sort((a, b) => {
+    const pa = a.split('/'), pb = b.split('/');
+    return new Date(pb[2], pb[1]-1, pb[0]) - new Date(pa[2], pa[1]-1, pa[0]);
+  });
+
+  const dSel = document.getElementById('tsel-filter-date');
+  if (dSel) {
+    const prev = dSel.value;
+    const todayStr = getTodayString();
+    dSel.innerHTML = '<option value="">Semua Tanggal</option>';
+    dates.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d;
+      o.textContent = d === todayStr ? `${d} (Hari Ini)` : d;
+      dSel.appendChild(o);
+    });
+    if (dates.includes(prev)) dSel.value = prev;
   }
 }
 
