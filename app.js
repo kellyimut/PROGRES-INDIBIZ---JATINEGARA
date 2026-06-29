@@ -662,24 +662,28 @@ function isCurrentMonthTsel(str) {
 
 /* ── TSEL KPI Render ── */
 function tselRenderKPI() {
-  const today = new Date();
   const data = tselFilteredData.length > 0 ? tselFilteredData : tselAllData;
 
-  // ── KPI HARIAN (selalu dari data hari ini, tidak kena filter) ──
+  // ── KPI HARIAN ──
+  // Order hari ini = baris yang Tgl Order BIMA (kolom B) = hari ini
   const orderHariIni = tselAllData.filter(r => isTodayTsel(r['_COL_B']));
+
+  // Setting hari ini = baris yang Tgl Setting (kolom A) = hari ini
   const settingHariIni = tselAllData.filter(r => isTodayTsel(r['_COL_A']));
+
+  // COMPWORK hari ini = dari settingHariIni yang Status BIMA = COMPWORK
   const compworkHariIni = settingHariIni.filter(r => (r['_COL_H'] || '').toUpperCase().trim() === 'COMPWORK');
 
-  const compworkSetting = compworkHariIni.length;
-  const prodPerTeknisi = tselTeknisiHadir > 0
-    ? (compworkSetting / tselTeknisiHadir).toFixed(2)
-    : compworkSetting;
-
+  // RE/PS harian = COMPWORK setting hari ini / total setting hari ini
   const rePS_harian = settingHariIni.length > 0
     ? Math.round((compworkHariIni.length / settingHariIni.length) * 100)
     : 0;
-
   const color_harian = rePS_harian >= 70 ? 'kpi-green' : rePS_harian >= 50 ? 'kpi-amber' : 'kpi-red';
+
+  // Produktifitas harian = COMPWORK setting hari ini / teknisi hadir
+  const prodHarian = tselTeknisiHadir > 0
+    ? (compworkHariIni.length / tselTeknisiHadir).toFixed(2)
+    : compworkHariIni.length;
 
   document.getElementById('tsel-kpi-harian').innerHTML = `
     <div class="kpi-card kpi-dark">
@@ -690,7 +694,7 @@ function tselRenderKPI() {
     <div class="kpi-card kpi-blue">
       <div class="kpi-label">Setting Hari Ini</div>
       <div class="kpi-value">${settingHariIni.length}</div>
-      <div class="kpi-sub">dari Tgl Setting</div>
+      <div class="kpi-sub">dari Tgl Setting (kol A)</div>
     </div>
     <div class="kpi-card kpi-green">
       <div class="kpi-label">COMPWORK Hari Ini</div>
@@ -710,29 +714,32 @@ function tselRenderKPI() {
     </div>
     <div class="kpi-card kpi-blue">
       <div class="kpi-label">Produktifitas</div>
-      <div class="kpi-value">${prodPerTeknisi}</div>
-      <div class="kpi-sub">order/teknisi · ${tselTeknisiHadir} hadir</div>
+      <div class="kpi-value">${prodHarian}</div>
+      <div class="kpi-sub">COMPWORK/teknisi · ${tselTeknisiHadir} hadir</div>
     </div>`;
 
-  // ── KPI BULANAN (mengikuti filter) ──
+  // ── KPI BULANAN (mengikuti filter bulan/tahun) ──
+  // Order bulan ini = dari filtered data, Tgl Order BIMA (kolom B) ada
   const orderBulan = data.filter(r => r['_COL_B']);
+
+  // COMPWORK bulan ini = dari orderBulan yang Status BIMA = COMPWORK
   const compworkBulan = orderBulan.filter(r => (r['_COL_H'] || '').toUpperCase().trim() === 'COMPWORK');
   const canclBulan    = orderBulan.filter(r => (r['_COL_H'] || '').toUpperCase().trim() === 'CANCLWORK');
   const wapprBulan    = orderBulan.filter(r => (r['_COL_H'] || '').toUpperCase().trim() === 'WAPPR');
   const failBulan     = orderBulan.filter(r => (r['_COL_H'] || '').toUpperCase().trim() === 'WORKFAIL');
 
+  // RE/PS bulan = COMPWORK bulan / total order bulan (dari Tgl Order BIMA)
   const rePS_bulan = orderBulan.length > 0
     ? Math.round((compworkBulan.length / orderBulan.length) * 100)
     : 0;
   const color_bulan = rePS_bulan >= 70 ? 'kpi-green' : rePS_bulan >= 50 ? 'kpi-amber' : 'kpi-red';
 
-  const settingBulan = data.filter(r => r['_COL_A']);
-  const compworkSettingBulan = settingBulan.filter(r => (r['_COL_H'] || '').toUpperCase().trim() === 'COMPWORK');
+  // Produktifitas bulanan = COMPWORK bulan / teknisi hadir
   const prodBulan = tselTeknisiHadir > 0
-    ? (compworkSettingBulan.length / tselTeknisiHadir).toFixed(2)
-    : compworkSettingBulan.length;
+    ? (compworkBulan.length / tselTeknisiHadir).toFixed(2)
+    : compworkBulan.length;
 
-  // Label filter aktif
+  // Label periode
   const mSel = document.getElementById('tsel-filter-month');
   const ySel = document.getElementById('tsel-filter-year');
   const bulanLabel = mSel && mSel.options[mSel.selectedIndex] ? mSel.options[mSel.selectedIndex].text : '';
@@ -741,35 +748,35 @@ function tselRenderKPI() {
 
   document.getElementById('tsel-kpi-bulanan').innerHTML = `
     <div class="kpi-card kpi-dark">
-      <div class="kpi-label">Total Order</div>
+      <div class="kpi-label">Total Order Bulan Ini</div>
       <div class="kpi-value">${orderBulan.length}</div>
-      <div class="kpi-sub">${periodLabel}</div>
+      <div class="kpi-sub">${periodLabel} · Tgl Order BIMA</div>
+    </div>
+    <div class="kpi-card kpi-dark">
+      <div class="kpi-label">Total Status BIMA</div>
+      <div class="kpi-value">${orderBulan.length}</div>
+      <div class="kpi-sub">dari Tgl Order BIMA</div>
     </div>
     <div class="kpi-card kpi-green">
-      <div class="kpi-label">COMPWORK</div>
+      <div class="kpi-label">COMPWORK Bulan Ini</div>
       <div class="kpi-value">${compworkBulan.length}</div>
       <div class="kpi-sub">selesai · ${Math.round(compworkBulan.length/Math.max(orderBulan.length,1)*100)}%</div>
     </div>
-    <div class="kpi-card kpi-amber">
-      <div class="kpi-label">WAPPR</div>
-      <div class="kpi-value">${wapprBulan.length}</div>
-      <div class="kpi-sub">menunggu approval</div>
+    <div class="kpi-card ${color_bulan}">
+      <div class="kpi-label">RE/PS Bulan Ini</div>
+      <div class="kpi-value">${rePS_bulan}%</div>
+      <div class="progress-bg"><div class="progress-fill" style="width:${rePS_bulan}%;background:#CC0000;"></div></div>
+      <div class="kpi-sub">${compworkBulan.length} COMPWORK / ${orderBulan.length} order</div>
     </div>
-    <div class="kpi-card kpi-red">
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-label">Produktifitas Bulan Ini</div>
+      <div class="kpi-value">${prodBulan}</div>
+      <div class="kpi-sub">COMPWORK/teknisi · ${tselTeknisiHadir} hadir</div>
+    </div>
+    <div class="kpi-card kpi-amber">
       <div class="kpi-label">CANCLWORK / FAIL</div>
       <div class="kpi-value">${canclBulan.length + failBulan.length}</div>
       <div class="kpi-sub">cancel: ${canclBulan.length} · fail: ${failBulan.length}</div>
-    </div>
-    <div class="kpi-card ${color_bulan}">
-      <div class="kpi-label">RE/PS Periode</div>
-      <div class="kpi-value">${rePS_bulan}%</div>
-      <div class="progress-bg"><div class="progress-fill" style="width:${rePS_bulan}%;background:#CC0000;"></div></div>
-      <div class="kpi-sub">${compworkBulan.length} / ${orderBulan.length} order</div>
-    </div>
-    <div class="kpi-card kpi-blue">
-      <div class="kpi-label">Produktifitas</div>
-      <div class="kpi-value">${prodBulan}</div>
-      <div class="kpi-sub">COMPWORK/teknisi</div>
     </div>`;
 }
 
