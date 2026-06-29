@@ -1068,22 +1068,22 @@ async function loadTselData() {
     const text = await res.text();
     const { header, rows } = parseCSV(text);
 
-    // Map kolom berdasarkan index (sesuai spesifikasi Bang Kelly)
-    // A=0, B=1, C=2, D=3, F=5, G=6, H=7, P=15, X=23, Y=24
-    // Header row = row 2 di spreadsheet, row 1 = judul
-    // Kita skip row pertama jika itu header kategori, ambil ab baris data
-    // Detect header: jika baris pertama hasil CSV adalah header nama kolom
-    tselAllData = rows.map((r, idx) => {
-      // Ambil values sebagai array
+    // Spreadsheet punya 2 baris header:
+    // Baris 1 = judul kategori (X, UPDATE MANU, DATA AREA) → ini yang dibaca parseCSV sebagai header
+    // Baris 2 = nama kolom (Tanggal Setting, Tanggal Order B, dst) → ini jadi row pertama di rows[]
+    // Baris 3+ = data sebenarnya
+    // Jadi kita skip rows[0] (yang isinya nama kolom), data mulai rows[1]
+
+    const dataRows = rows.slice(1); // skip baris header kedua
+    tselAllData = dataRows.map((r, idx) => {
       const vals = Object.values(r);
-      // Atau pakai header yang ditemukan
-      const keys = Object.keys(r);
       return {
-        _ROW_INDEX: idx + 3, // +3 karena header di row 2, data mulai row 3
+        _ROW_INDEX: idx + 3, // row 3 di spreadsheet = index 0 di dataRows
         _COL_A: vals[0]  || '', // Tanggal Setting
         _COL_B: vals[1]  || '', // Tanggal Order BIMA
         _COL_C: vals[2]  || '', // Workorder PSB
         _COL_D: vals[3]  || '', // Workorder ODP Validation
+        _COL_E: vals[4]  || '', // SC Order No
         _COL_F: vals[5]  || '', // Service No
         _COL_G: vals[6]  || '', // CRM Order Type
         _COL_H: vals[7]  || '', // Status BIMA
