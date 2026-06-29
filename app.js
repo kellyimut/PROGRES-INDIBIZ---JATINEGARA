@@ -20,11 +20,11 @@ const IB_CSV_URL =
 //
 // Sementara menggunakan gid=0 (sheet pertama). Ganti sesuai gid sheet "DATA RE JTN"
 const TSEL_CSV_URL =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTNMvUECIc8TJbeMynfITc5c03iYqp5I1lyqKZ27H7n82I6Z8RfPCSs1Axz-hGP1I0YfR6yjOYYO0U/pub?gid=0&single=true&output=csv';
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vS1n1wEMS9qPOCP6XDFDBbe03y5lNl5D-9Aq8fSYJtpTLLjX3nQFL4EL6ZXkllhRLcshjpA11AeFKS8/pub?gid=0&single=true&output=csv';
 
 // Sheet "TEKNISI HARI INI" — untuk card jumlah teknisi hadir
 const TSEL_TEKNISI_CSV_URL =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTNMvUECIc8TJbeMynfITc5c03iYqp5I1lyqKZ27H7n82I6Z8RfPCSs1Axz-hGP1I0YfR6yjOYYO0U/pub?gid=1786853045&single=true&output=csv';
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vS1n1wEMS9qPOCP6XDFDBbe03y5lNl5D-9Aq8fSYJtpTLLjX3nQFL4EL6ZXkllhRLcshjpA11AeFKS8/pub?gid=82778435&single=true&output=csv';
 
 // Apps Script Web App URL untuk update data TSEL ke Google Sheets
 // Bang Kelly perlu mengganti ini dengan URL Apps Script yang sudah di-deploy
