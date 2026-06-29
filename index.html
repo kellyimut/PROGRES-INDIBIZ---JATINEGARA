@@ -304,36 +304,11 @@
         <div class="table-count" id="tsel-count-setting"></div>
       </div>
 
-      <!-- Table Total Order -->
-      <section class="section-label">Total Order TSEL (dari Tanggal Order BIMA)</section>
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.65rem;flex-wrap:wrap;gap:8px;">
-          <div style="font-size:11px;color:#A32D2D;">⚡ Kolom Tanggal Setting, Status BIMA, Regu/Teknisi, dan Status QC2 dapat diedit langsung.</div>
-          <input type="text" id="tsel-search-total" placeholder="Cari workorder, status..." oninput="tselRenderTotal()" style="font-size:12px;padding:5px 10px;border:1px solid #E0DED8;border-radius:6px;background:#F5F5F3;color:#1C1C1A;outline:none;width:260px;" />
-        </div>
-        <div class="scroll-nav">
-          <span class="scroll-hint">Geser tabel:</span>
-          <button class="scroll-btn" onclick="scrollTable('tsel-wrap-total', -200)">&#8592;</button>
-          <button class="scroll-btn" onclick="scrollTable('tsel-wrap-total', 200)">&#8594;</button>
-        </div>
-        <div class="table-wrap" id="tsel-wrap-total">
-          <table style="min-width:1150px;">
-            <thead>
-              <tr>
-                <th>Tgl Setting ✎</th>
-                <th>Tgl Order BIMA</th>
-                <th>Workorder PSB</th>
-                <th>WO ODP Validation</th>
-                <th>CRM Order Type</th>
-                <th>Status BIMA ✎</th>
-                <th>Regu/Teknisi ✎</th>
-                <th>Status QC2 ✎</th>
-              </tr>
-            </thead>
-            <tbody id="tsel-tbody-total"><tr><td colspan="8" class="td-center">Memuat data...</td></tr></tbody>
-          </table>
-        </div>
-        <div class="table-count" id="tsel-count-total"></div>
+      <!-- Hidden elements needed by JS -->
+      <div style="display:none;">
+        <input id="tsel-search-total" />
+        <tbody id="tsel-tbody-total"></tbody>
+        <div id="tsel-count-total"></div>
       </div>
     </main>
   </div>
