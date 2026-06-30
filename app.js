@@ -619,21 +619,34 @@ function tselUpdateDateFilter() {
 // Tanggal di sheet bisa dalam berbagai format. Coba parse flexibel.
 function parseTselDate(str) {
   if (!str) return null;
-  str = str.trim();
-  // Format DD/MM/YYYY
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
-    const [d, m, y] = str.split('/');
-    return new Date(y, m-1, d);
+  // Bersihkan non-breaking space / karakter aneh dari Google Sheets export, lalu ambil bagian tanggal saja (sebelum spasi/jam)
+  str = str.replace(/\u00A0|\u00C2|\u202F/g, ' ').trim();
+  const datePart = str.split(/\s+/)[0]; // ambil token pertama sebelum jam
+  if (!datePart) return null;
+
+  // Format DD/MM/YYYY atau D/M/YYYY (dengan/tanpa leading zero)
+  const dmy = datePart.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (dmy) {
+    const a = parseInt(dmy[1], 10);
+    const b = parseInt(dmy[2], 10);
+    const y = parseInt(dmy[3], 10);
+    // Heuristik: jika token pertama > 12, pasti hari (DD/MM/YYYY).
+    // Jika token kedua > 12, pasti bulan ada di token pertama (MM/DD/YYYY, format US dari Sheets).
+    // Selain itu, sumber data TSEL utamanya DD/MM/YYYY → default ke itu.
+    let day, month;
+    if (a > 12 && b <= 12) { day = a; month = b; }
+    else if (b > 12 && a <= 12) { day = b; month = a; }
+    else { day = a; month = b; } // ambigu (keduanya <=12) → asumsikan DD/MM/YYYY (format dominan sheet ini)
+    const d = new Date(y, month - 1, day);
+    return isNaN(d.getTime()) ? null : d;
   }
-  // Format YYYY-MM-DD
-  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
-    return new Date(str);
+
+  // Format YYYY-MM-DD (dengan/tanpa jam, mis. "2026-05-14 13:00:00")
+  if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+    const d = new Date(datePart + 'T00:00:00');
+    return isNaN(d.getTime()) ? null : d;
   }
-  // Format MM/DD/YYYY (US style dari Google Sheets)
-  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str)) {
-    const parts = str.split('/');
-    return new Date(parts[2], parts[0]-1, parts[1]);
-  }
+
   return null;
 }
 
