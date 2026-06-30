@@ -1070,41 +1070,28 @@ async function loadTselData() {
     const res = await fetch(TSEL_CSV_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
-    const { header, rows } = parseCSV(text);
-
-    // Spreadsheet punya 2 baris header:
-    // Baris 1 = judul kategori (X, UPDATE MANU, DATA AREA) → ini yang dibaca parseCSV sebagai header
-    // Baris 2 = nama kolom (Tanggal Setting, Tanggal Order B, dst) → ini jadi row pertama di rows[]
-    // Baris 3+ = data sebenarnya
-    // Jadi kita skip rows[0] (yang isinya nama kolom), data mulai rows[1]
-
-    const dataRows = rows.slice(1); // skip baris header kedua
-    // Debug: cek 3 baris pertama
-    console.log('DEBUG rows[0]:', JSON.stringify(Object.values(rows[0])).substring(0, 200));
-    console.log('DEBUG rows[1]:', JSON.stringify(Object.values(rows[1])).substring(0, 200));
-    console.log('DEBUG dataRows[0] vals:', JSON.stringify(Object.values(dataRows[0])).substring(0, 200));
-    console.log('DEBUG dataRows[0] COL_H (index 7):', Object.values(dataRows[0])[7]);
-    tselAllData = dataRows.map((r, idx) => {
-      const vals = Object.values(r);
+    // Parse langsung pakai index — bypass parseCSV karena header row 1
+    // punya banyak kolom kosong/duplikat yang merusak key-based mapping.
+    const allLines = text.split("\n").filter(l => l.trim());
+    // Baris 0 = judul kategori (X,,,,DATA BASED ON BIMA...)
+    // Baris 1 = nama kolom (Tanggal Setting, Tanggal Order BIMA, ...)
+    // Baris 2+ = data sebenarnya
+    const dataLines = allLines.slice(2);
+    tselAllData = dataLines.map((line, idx) => {
+      const vals = splitCSVLine(line);
       return {
-        _ROW_INDEX: idx + 3, // row 3 di spreadsheet = index 0 di dataRows
-        _COL_A: vals[0]  || '', // Tanggal Setting
-        _COL_B: vals[1]  || '', // Tanggal Order BIMA
-        _COL_C: vals[2]  || '', // Workorder PSB
-        _COL_D: vals[3]  || '', // Workorder ODP Validation
-        _COL_E: vals[4]  || '', // SC Order No
-        _COL_F: vals[5]  || '', // Service No
-        _COL_G: vals[6]  || '', // CRM Order Type
-        _COL_H: vals[7]  || '', // Status BIMA
-        _COL_P: vals[15] || '', // Progress
-        _COL_X: vals[23] || '', // Regu/Teknisi
-        _COL_Y: vals[24] || '', // Status QC2
-        _RAW: r
+        _ROW_INDEX: idx + 3,
+        _COL_A: (vals[0]  || "").trim(),
+        _COL_B: (vals[1]  || "").trim(),
+        _COL_C: (vals[2]  || "").trim(),
+        _COL_D: (vals[3]  || "").trim(),
+        _COL_G: (vals[6]  || "").trim(),
+        _COL_H: (vals[7]  || "").trim(),
+        _COL_P: (vals[15] || "").trim(),
+        _COL_X: (vals[23] || "").trim(),
+        _COL_Y: (vals[24] || "").trim(),
       };
-    }).filter(r => r['_COL_B'] || r['_COL_C']); // filter baris yang punya data
-
-    // Load sheet TEKNISI HARI INI
-    try {
+    }).filter(r => r["_COL_B"] || r["_COL_C"]);
       const resT = await fetch(TSEL_TEKNISI_CSV_URL);
       if (resT.ok) {
         const textT = await resT.text();
