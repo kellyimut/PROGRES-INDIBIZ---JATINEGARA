@@ -1092,15 +1092,14 @@ async function loadTselData() {
         _COL_Y: (vals[24] || "").trim(),
       };
     }).filter(r => r["_COL_B"] || r["_COL_C"]);
+
+    try {
       const resT = await fetch(TSEL_TEKNISI_CSV_URL);
       if (resT.ok) {
         const textT = await resT.text();
         const { rows: rowsT } = parseCSV(textT);
         // Asumsi: sheet ini berisi daftar teknisi yang hadir hari ini
-        // Hitung baris yang berisi nama teknisi (non-kosong)
-        // Hitung teknisi hadir:
         // Cari baris yang mengandung "JTN |" (format nama teknisi)
-        // Ini paling robust karena tidak bergantung jumlah baris header
         tselTeknisiHadir = rowsT.filter(r => {
           const rowText = Object.values(r).join(' ').trim();
           return rowText.toUpperCase().includes('JTN |') || rowText.toUpperCase().includes('JTN|');
