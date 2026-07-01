@@ -728,7 +728,7 @@ function tselRenderKPI() {
     <div class="kpi-card kpi-blue">
       <div class="kpi-label">Produktifitas</div>
       <div class="kpi-value">${prodHarian}</div>
-      <div class="kpi-sub">COMPWORK/teknisi · ${tselTeknisiHadir} hadir</div>
+      <div class="kpi-sub">${compworkHariIni.length} COMPWORK / ${tselTeknisiHadir} teknisi hadir</div>
     </div>`;
 
   // ── KPI BULANAN (mengikuti filter bulan/tahun) ──
@@ -784,7 +784,7 @@ function tselRenderKPI() {
     <div class="kpi-card kpi-blue">
       <div class="kpi-label">Produktifitas Bulan Ini</div>
       <div class="kpi-value">${prodBulan}</div>
-      <div class="kpi-sub">COMPWORK/teknisi · ${tselTeknisiHadir} hadir</div>
+      <div class="kpi-sub">${compworkBulan.length} COMPWORK / ${tselTeknisiHadir} teknisi hadir</div>
     </div>
     <div class="kpi-card kpi-amber">
       <div class="kpi-label">CANCLWORK / FAIL</div>
